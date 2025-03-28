@@ -62,7 +62,9 @@ int main(int argc, char *argv[]) {
   insertion_sort(array, length);
 
   /* show the ordered array in the screen */
-  array_dump(array, length);
+  //array_dump(array, length);
+
+  array_dump_2(array, length);
 
   /* check if it is sorted */
   assert(array_is_sorted(array, length));
