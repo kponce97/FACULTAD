@@ -56,9 +56,11 @@ static unsigned int partition(int a[], unsigned int izq, unsigned int der)
 
 static void quick_sort_rec(int a[], unsigned int izq, unsigned int der)
 {
+
     if (goes_before(izq, der))
     {
         unsigned int pivot = partition(a, izq, der);
+        printf("-PIVOT = %d \n-IZQ =\t %d \n-DER =\t %d\n-----------------------\n", a[pivot], a[izq], a[der]);
         quick_sort_rec(a, izq, pivot - 1);
         quick_sort_rec(a, pivot + 1, der);
     }
