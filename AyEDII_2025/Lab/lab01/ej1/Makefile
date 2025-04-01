@@ -1,6 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic -std=c99 -g
-#CFLAGS = -Wall -pedantic -std=c99 -g
+CFLAGS =-Wall -Werror -Wextra -pedantic -std=c99 -c array_helpers.c 
 
 GDB = gdb
 VAL = valgrind --track-origins=yes --leak-check=full
@@ -11,6 +10,7 @@ EJ = ../input/example-unsorted.in
 all:clean reader.output
 
 %.output:	
+		@echo "--> Archivos Compilados..."
 		$(CC) $(CFLAGS) -c main.c
 		$(CC) $(CFLAGS) -c *.c
 		$(CC) $(CFLAGS) *.o -o $(READER)
