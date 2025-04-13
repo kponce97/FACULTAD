@@ -13,5 +13,6 @@
  * @param k Posicion dentro del arreglo si estuviera ordenado.
  */
 int k_esimo(int a[], int length, int k);
+void imp_arreglo(int a[], int length);
 
 #endif
