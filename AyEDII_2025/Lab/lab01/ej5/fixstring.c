@@ -30,7 +30,17 @@ bool fstring_eq(fixstring s1, fixstring s2)
 
 bool fstring_less_eq(fixstring s1, fixstring s2)
 {
-    /* copiá acá la implementación que hiciste en el ejercicio 0 */
+    bool result;
+    unsigned int min_length = fstring_length(s1) < fstring_length(s2) ? fstring_length(s1) : fstring_length(s2);
+    unsigned int i = 0;
+    while (i < min_length && s1[i] == s2[i])
+    {
+        i = i + 1;
+    }
+    result = (i == min_length) ? fstring_length(s1) <= fstring_length(s2) : s1[i] <= s2[i];
+
+    return result;
+
 }
 
 void fstring_set(fixstring s1, const fixstring s2)
