@@ -8,15 +8,39 @@
 #include <stdlib.h>
 
 #include "weather_table.h"
+void max_rainfall_by_month_of_table_print(month_t a[YEARS])
+{
+    char const *months[] = {"January",
+                            "February",
+                            "March",
+                            "April",
+                            "May",
+                            "June",
+                            "July",
+                            "August",
+                            "September",
+                            "October",
+                            "November",
+                            "December"};
+
+    for (int k_year = FST_YEAR; k_year <= LST_YEAR; k_year = k_year + 1)
+    {
+        printf("For year %d, the month with the highest monthly amount of rainfall is: %s\n", k_year, months[a[k_year - FST_YEAR]]);
+    }
+}
 
 /**
  * @brief Write the content of the table 'a' into stdout.
  * @param[in] a table to dump in stdout
  */
-void table_dump(WeatherTable a) {
-    for (unsigned int year = 0u; year < YEARS; ++year) {
-        for (month_t month = january; month <= december; ++month) {
-            for (unsigned int day = 0u; day < DAYS; ++day) {
+void table_dump(WeatherTable a)
+{
+    for (unsigned int year = 0u; year < YEARS; ++year)
+    {
+        for (month_t month = january; month <= december; ++month)
+        {
+            for (unsigned int day = 0u; day < DAYS; ++day)
+            {
                 // imprimir año, mes y día
                 fprintf(stdout, "%u %u %u ", year + FST_YEAR, month + 1, day + 1);
 
@@ -45,11 +69,13 @@ void table_dump(WeatherTable a) {
  * @param a table which will contain read file
  * @param filepath file with weather data
  */
-void table_from_file(WeatherTable a, const char *filepath) {
+void table_from_file(WeatherTable a, const char *filepath)
+{
     FILE *file = NULL;
 
     file = fopen(filepath, "r");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         fprintf(stderr, "File does not exist.\n");
         exit(EXIT_FAILURE);
     }
@@ -57,15 +83,19 @@ void table_from_file(WeatherTable a, const char *filepath) {
     unsigned int k_year = 0u;
     unsigned int k_month = 0u;
     unsigned int k_day = 0u;
-    while (!feof(file)) {
+    while (!feof(file))
+    {
         int res = fscanf(file, " %u %u %u ", &k_year, &k_month, &k_day);
-        if (res != 3) {
-            fprintf(stderr, "Invalid table.\n");
+        if (res != 3)
+        {
+            fprintf(stderr, "Invalid table. --> %d\n", res);
             exit(EXIT_FAILURE);
         }
 
         // Ir a la función 'weather_from_file' en weather.c y completar!
         Weather weather = weather_from_file(file);
+
+        a[k_year - FST_YEAR][k_month - 1][k_day - 1] = weather;
 
         // También completar acá:
         // Guardar la medición de clima en el arreglo multidimensional.

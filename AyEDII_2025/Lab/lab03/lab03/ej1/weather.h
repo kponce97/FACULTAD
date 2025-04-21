@@ -6,6 +6,8 @@
 #ifndef _WEATHER_H
 #define _WEATHER_H
 #include <stdio.h>
+#define EXPECTED_WEATHER_FILE_FORMAT " %d %d %d %u %u %u "
+
 
 /** @brief Type used to represent a weather mesuarement.*/
 typedef struct _weather

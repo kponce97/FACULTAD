@@ -20,6 +20,9 @@ typedef enum {january, february, march, april, may, june, july, august, septembe
 
 typedef Weather WeatherTable [YEARS][MONTHS][DAYS];
 
+void max_rainfall_by_month_of_table_print(month_t a[YEARS]);
+
+
 /**
  * @brief Write the content of the table 'a' into stdout.
  * @param[in] a table to dump in stdout

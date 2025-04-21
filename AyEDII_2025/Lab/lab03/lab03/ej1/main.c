@@ -7,7 +7,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "weather_utils.h"
+#define N_TESTS_CASE 37
 /* Then, this project's includes, alphabetically ordered */
 #include "weather_table.h"
 
@@ -15,7 +16,8 @@
  * @brief print usage help
  * @param[in] program_name Executable name
  */
-void print_help(char *program_name) {
+void print_help(char *program_name)
+{
     /* Print the usage help of this program. */
     printf("Usage: %s <input file path>\n\n"
            "Load climate data from a given file in disk.\n"
@@ -35,11 +37,13 @@ void print_help(char *program_name) {
  *
  * @return An string containing read filepath
  */
-char *parse_filepath(int argc, char *argv[]) {
+char *parse_filepath(int argc, char *argv[])
+{
     /* Parse the filepath given by command line argument. */
     char *result = NULL;
 
-    if (argc < 2) {
+    if (argc < 2)
+    {
         print_help(argv[0]);
         exit(EXIT_FAILURE);
     }
@@ -57,7 +61,8 @@ char *parse_filepath(int argc, char *argv[]) {
  *
  * @return EXIT_SUCCESS when programs executes correctly, EXIT_FAILURE otherwise
  */
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     char *filepath = NULL;
 
     /* parse the filepath given in command line arguments */
@@ -71,6 +76,22 @@ int main(int argc, char *argv[]) {
 
     /* show the table in the screen */
     table_dump(table);
+
+    printf("\n---------------------------------------\n");
+    /* Menor temperatura minima */
+    int min_temp = min_temp_Cba(table);
+    printf("Menor temperatura minima: \t[ %d ]\n", min_temp);
+
+    printf("\n---------------------------------------\n");
+    /* Maxima temperatura registrada para cada año entre 1980 y 2016 */
+    int out_year[YEARS];
+    max_temp_for_year(table, out_year);
+
+    printf("\n-----------------------------------------------------------------------------------\n");
+    /* Maxima cantidad mensual de precipitaciones de cada año entre 1980 y 2016 */
+    month_t out[YEARS];
+    max_rainfall_for_month(table, out);
+    max_rainfall_by_month_of_table_print(out);
 
     return EXIT_SUCCESS;
 }
