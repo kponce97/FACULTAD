@@ -40,7 +40,6 @@ bool fstring_less_eq(fixstring s1, fixstring s2)
     result = (i == min_length) ? fstring_length(s1) <= fstring_length(s2) : s1[i] <= s2[i];
 
     return result;
-
 }
 
 void fstring_set(fixstring s1, const fixstring s2)
@@ -57,5 +56,7 @@ void fstring_set(fixstring s1, const fixstring s2)
 void fstring_swap(fixstring s1, fixstring s2)
 {
     fixstring aux;
-    fstring_set(aux, )
+    fstring_set(aux, s1);
+    fstring_set(s1, s2);
+    fstring_set(s2, aux);
 }
