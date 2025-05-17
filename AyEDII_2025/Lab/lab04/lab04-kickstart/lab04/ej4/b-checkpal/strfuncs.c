@@ -6,6 +6,7 @@
 size_t string_length(const char *str)
 {
 	unsigned int len = 0u;
+
 	while (str[len] != '\0')
 	{
 		len++;
@@ -16,7 +17,7 @@ size_t string_length(const char *str)
 char *string_filter(const char *str, char c)
 {
 	char *res = NULL;
-	res = malloc((string_length(str) * sizeof(char) + 1));
+	res = malloc((string_length(str) + 1) * sizeof(char));
 	unsigned int res_pos = 0u;
 
 	for (unsigned int i = 0u; str[i] != '\0'; i++)
@@ -42,5 +43,8 @@ bool string_is_symmetric(const char *str)
 			res = false;
 	}
 
-	return (res && (string_length(str) == 0));
+	if (string_length(str) == 0)
+		res = false;
+
+	return res;
 }
