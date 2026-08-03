@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Scala",
+    "url": "http://localhost:8123/r/scala/.json"
+  },
+  {
+    "name": "Learn Python",
+    "url": "http://localhost:8123/r/learnpython/.json"
+  },
+  {
+    "name": "Programming",
+    "url": "http://localhost:8123/r/programming/.json"
+  }
+]
