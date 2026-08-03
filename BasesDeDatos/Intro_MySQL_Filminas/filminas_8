@@ -1,0 +1,188 @@
+-- MongoDB: Almacena los datos como documentos BSON, y almacena los documentos 
+--			en COLECCIONES, una BD almacena una o mas colecciones de doc.
+-- 			Un documento es una estructura de datos compuesta de pares CAMPO - VALOR
+	MongoDB almacena colecciones (Serian las tablas en MySQL), 
+	Cada colección contiene documentos ( Serian las "filas" de MySQL)
+	Los documentos son objetos JSON (BSON) con datos y campos
+-- Bases de Datos No Relacionales (NoSQL)
+
+/* 
+Campo _id -> Actua como clave primaria, es inmutable, si se omite al insertar un doc, se 
+autogenera
+ */
+
+-- Documento
+{
+	"_id": "153499", -- field: value
+	"name": "Joe Moore", 
+	"age": 22,
+	"phones":["1234455","1244555"], -- Arreglo
+	"address": {
+		"street":"Joe",
+		"phones": "Moore", -- Documento Anidado
+		"state": "Moore"
+	}
+}
+
+/* 
+Mongo DB Shell (mongosh y mongo)
+	Comandos Basicos
+		- show dbs 	--> Lista todas las BD del servidor
+		- use <db> 	--> Cambia la BD actual a <db>
+		- db 		--> Variable que representa la BD actual 
+		- show collections --> Lista todas la colecciones de la BD actual
+		- db.createColletion(name,<options>) --> Crea una nueva colecciones
+		- db.<collection>.help() --> Muestra ayuda sobre metodos de coleccion
+ */
+
+/* 
+Operaciones CRUD
+> db.<collection>.insertOne(<document>) // Inserta un solo documento en la colección
+> db.<collection>.insertMany([ <doc1>, ..., <docN> ])  // Inserta varios documentos a la vez
+> db.<collection>.findOne(<query filter>, <projection>) // Busca y devuelve el primer documento que cumpla el filtro
+> db.<collection>.find(<query filter>, <projection>)    // Busca y devuelve todos los documentos que cumplan el filtro
+> db.<collection>.updateOne(<query filter>, <update>, <options>) // Actualiza el primer documento que cumpla el filtro
+> db.<collection>.updateMany(<query filter>, <update>, <options>) // Actualiza todos los documentos que cumplan el filtro
+> db.<collection>.deleteOne(<query filter>)  // Elimina el primer documento que cumpla el filtro
+> db.<collection>.deleteMany(<query filter>) // Elimina todos los documentos que cumplan el filtro
+
+
+ 
+CRUD - FIND 
+> db.<collection>.find( 
+> 	<query filter>,
+> 	<projection>
+> )
+	- projection especifica los campos a devolver de los doc que matchean con el filtro
+	- find retorna los doc que matchean con el criterio, el resultado es un CURSOR
+ 
+--Ver todos los valores únicos de "campo" en una colección:
+db.coleccion.distinct("campo", { filtro_opcional }) -- { filtro_opcional }: (opcional) para filtrar documentos antes.
+*/
+
+<!-- 
+* FIND: 	Cuando haces una consulta con .find(), puedes controlar qué campos quieres mostrar en los resultados. Eso es lo que se 
+		llama proyección.
+* projection: La proyección decide qué campos mostrar u ocultar.		
+* Campos anidados:
+		db.inventory.find({}, { "size.uom": 1, _id: 0 }) | db.inventory.find({},{ "size":{"uom": 1}, _id: 0})
+		db.bios.find({}, { "name.last": 1 }) | db.bios.find({}, { "name": { "last": 1 } })
+
+
+*🧠* Proyección con expresiones de agregación (más avanzado):
+Permite calcular nuevos campos o transformar existentes. Esto no se hace con .find() directamente, sino dentro del pipeline de agregación:
+db.coleccion.aggregate([
+  {
+    $project: {
+      nuevoCampo: { $concat: ["$nombre", " ", "$apellido"] }
+    }
+  }
+])
+? Operadores de SELECCION:
+*	Operadores de Comparación
+	          db.<collection>.find( 
+	                       { <field>: { <operator>: <value> }, ... }
+	          )
+	Operadores:
+		$eq → igual			$gte → mayor_igual
+		$ne → distinto		$lt → menor
+		$gt → mayor			$lte → menor_igual
+		$in → incluido		$nin → excluido
+	-- Devuelve los menores a 30
+	db.inventory.find( 
+	{ qty: { $lt: 30 } }
+	 )
+	-- Devuelve los que tienen status A o D
+	db.inventory.find( 
+	{ "status" : { $in: ["A", "D"] } } 
+	)
+
+
+*	Operadores Logicos
+	        db.<collection>.find( 
+	                     { <operator>: [ { clause1 }, { clause2 }, … ] })
+	        db.<collection>.find( 
+	                     { <operator>: { clause } }
+	        )
+	Operadores
+		$and → todas		$nor → ninguna
+		$or → alguna		$not → niega
+*	Consulta documentos anidados
+db.inventory.find( { "size.w": { $gte: 16 } } ) -- Devuelve los size.w >= 16 (mayor igual)
+
+* Consulta en arreglo
+	- Matchear un arreglo
+	    db.food.find( {"fruits":  ["cherry", "banana" ] } )
+	* db.<collection>.find( { <array field>: { <operator>: <value> }, ... })
+	- Operadores
+		$all: matchea si el campo arreglo contiene todos los elementos especificados en value
+		$elemMatch: matchea si al menos un elemento en el campo arreglo cumple todas las condiciones especificadas
+		$size: matchea si el campo arreglo es del largo especificado
+
+{ "item": 1} -- No muestra el campo item
+1 = mostrar ese campo,
+0 = ocultar ese campo.
+db.inventory.find( {"status":  {"$eq": "A" }}, { "item": 1} )
+             	= {Azúcar sintáctico de $eq}
+             	db.inventory.find( { "status":  "A" }, { "item": 1} )
+
+* Consulta por nulos o campos ausentes 
+db.inventory.find( { item: null } ) -- > Matchear por campo null o ausente
+db.inventory.find({ item: { $type: "string" } }) -- > Matchea por tipo
+db.inventory.find({ item: { $exists: true } }) -- > Matchea por existencia ( Busca docs donde exista el campo item)
+
+* Métodos del cursor - SORT SKIP LIMIT
+db.<collection>.find(<query filter>, <projection>)
+		.sort({ <field1>: <1 or -1>, <field2>: <1 or -1> ... }) -- > 1 Ascendente | -1 Descendente
+		.skip(<offset>)	-- > Salta los primero N (offset) doc
+		.limit(<number>) -- > Limita la cantidad de resultados.
+  Ejemplo:
+  	Listar los 3 items con mayor cantidad dentro de los inventarios con estado "A". Listar en 
+  	orden alfabético si los items tiene la misma cantidad.
+	db.inventory.find(
+  		{ "status": "A" },              // Filtra por status = "A"
+  		{ "item": 1, "qty": 1 }         // Proyección: muestra solo item y qty (más _id por defecto)
+		)
+		.sort({ qty: -1, item: 1 })       // Ordena por qty descendente, luego item ascendente
+		.skip(0)                          // Salta 0 documentos (es decir, no salta ninguno)
+		.limit(3)                         // Limita a 3 resultados
+
+* CRUD - UPDATE - DELETE
+	Update 
+		db.<coleccion>.updateOne(     // o updateMany
+		  	{ <filtro> },               // condición para encontrar el documento
+  			{ <operador_de_actualización>: { <campo>: <valor> } }
+			$currentDate: { lastModified: true } // Esto pone lastModified con la fecha/hora actual en ese documento.
+		)
+		Operador de acutalizacion:
+			$set	Cambia el valor de un campo
+			$inc	Incrementa un campo numérico
+			$unset	Elimina un campo
+			$rename	Cambia el nombre de un campo
+			$mul	Multiplica un valor
+		Update + Insert
+			- Si hay un doc con url: "/blog", suma 1 a pageviews.
+			- Si no existe, crea un nuevo documento con { url: "/blog", pageviews: 1 }.
+			db.analytics.updateOne(
+			  { url: "/blog" },             // filtro para encontrar documento
+			  { $inc: { pageviews: 1 } },  // incrementa pageviews en 1
+			  { upsert: true }             // si no existe, crea con url="/blog" y pageviews=1
+			)
+	Delete
+		deleteOne -- > Elimina el primer documento que coincida con el filtro
+		db.inventory.deleteMany( { status: "A" } ) -- > Elimina todos los documentos que coincidan con el filtro.
+		db.inventory.drop() -- > Elimina toda la coleccion.
+
+
+--'projection' : El parámetro projection es opcional. 
+{ <field1>: <value>, <field2>: <value> ... }
+-- <field>: <1 or true> →especifica inclusión
+db.inventory.find( {}, { "item": 1, "qty": 1} )
+-- <field>: <0 or false> →especifica exclusión
+db.inventory.find( {}, { "qty": 0 } ) -- Por defecto se incluye el campo _id
+db.inventory.find( {}, { "item": 1, "qty": 1, "_id": 0} ) -- Proyectar campos anidados con la notación "." ("field.nestedField")
+db.bios.find( {}, { "name.last": 1 } ) -- O usando la forma anidada
+db.bios.find( {}, { "name": { "last": 1 } } )
+-- <field>: <aggregation expression> Con el uso de expresiones de agregación se pueden proyectar nuevos campos o proyectar existentes con nuevos valores
+
+ -->
